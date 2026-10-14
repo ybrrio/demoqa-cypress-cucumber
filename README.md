@@ -54,7 +54,8 @@ cypress/
 Fluxo: criar usuário, gerar token, confirmar autorização, listar livros, alugar 2 livros e consultar os detalhes do usuário.
 
 - Todas as respostas são validadas contra JSON Schema.
-- Negativos: senha fraca (400), usuário duplicado (406) e aluguel sem token (401).
+- Negativos: senha fraca (400), usuário duplicado (406), aluguel sem token e com token inválido (401), ISBN inexistente (400), livro já alugado (400), detalhes com token inválido (401) e token com senha errada.
+- Obs.: o GenerateToken responde 200 mesmo com senha errada (vem `status: "Failed"` e `token: null`).
 - O usuário criado é apagado no hook `After`.
 
 ## Frontend

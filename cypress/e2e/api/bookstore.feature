@@ -41,3 +41,38 @@ Funcionalidade: Book Store API - Aluguel de livros
     E que eu listo os livros disponíveis
     Quando eu tento alugar 1 livro sem token de acesso
     Então a API deve responder com status 401 e código de erro "1200"
+
+  @negativo
+  Cenário: Não deve permitir alugar livros com token inválido
+    Dado que eu crio o usuário
+    E que eu listo os livros disponíveis
+    Quando eu tento alugar 1 livro com um token inválido
+    Então a API deve responder com status 401 e código de erro "1200"
+
+  @negativo
+  Cenário: Não deve alugar um livro com ISBN inexistente
+    Dado que eu crio o usuário
+    E que eu gero um token de acesso
+    Quando eu tento alugar um livro com ISBN inexistente
+    Então a API deve responder com status 400 e código de erro "1205"
+
+  @negativo
+  Cenário: Não deve alugar um livro que já está na coleção
+    Dado que eu crio o usuário
+    E que eu gero um token de acesso
+    E que eu listo os livros disponíveis
+    E que eu alugo 1 livro da lista
+    Quando eu tento alugar o mesmo livro novamente
+    Então a API deve responder com status 400 e código de erro "1210"
+
+  @negativo
+  Cenário: Não deve exibir os detalhes do usuário com token inválido
+    Dado que eu crio o usuário
+    Quando eu consulto os detalhes do usuário com um token inválido
+    Então a API deve responder com status 401 e código de erro "1200"
+
+  @negativo
+  Cenário: Não deve gerar token com senha incorreta
+    Dado que eu crio o usuário
+    Quando eu gero um token de acesso com a senha incorreta
+    Então o token não deve ser gerado

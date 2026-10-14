@@ -33,7 +33,7 @@ Then("o usuário deve ser criado com sucesso", () => {
 });
 
 // Autenticação
-When("eu gero um token de acesso", () => {
+When("(que )eu gero um token de acesso", () => {
   AccountService.generateToken(ctx.get("user")).then((response) => {
     ctx.set("lastResponse", response);
     ctx.set("token", response.body.token);
@@ -47,6 +47,20 @@ Then("o token deve ser gerado com sucesso", () => {
   expect(response.body.result).to.eq("User authorized successfully.");
   expect(response.body.token).to.be.a("string").and.not.be.empty;
   cy.wrap(response.body).validateSchema("generateToken");
+});
+
+When("eu gero um token de acesso com a senha incorreta", () => {
+  const user = { ...ctx.get("user"), password: "SenhaErrada@123" };
+  AccountService.generateToken(user).then((response) => ctx.set("lastResponse", response));
+});
+
+// a API responde 200 mesmo quando a autenticação falha
+Then("o token não deve ser gerado", () => {
+  const response = ctx.get("lastResponse");
+  expect(response.status).to.eq(200);
+  expect(response.body.status).to.eq("Failed");
+  expect(response.body.token).to.be.null;
+  cy.wrap(response.body).validateSchema("generateTokenFailed");
 });
 
 When("eu verifico se o usuário está autorizado", () => {
@@ -76,25 +90,46 @@ Then("a lista de livros deve ser retornada com sucesso", () => {
   cy.wrap(response.body).validateSchema("books");
 });
 
-When("eu alugo {int} livros da lista", (quantity) => {
-  const chosenBooks = faker.helpers.arrayElements(ctx.get("availableBooks"), quantity);
+const INVALID_TOKEN = "token.invalido.123";
+const NONEXISTENT_ISBN = "0000000000000";
+
+const pickBooks = (quantity) => faker.helpers.arrayElements(ctx.get("availableBooks"), quantity);
+
+const rentBooks = (isbns, token) =>
+  BookStoreService.addBooksToUser({ userId: ctx.get("userId"), isbns, token }).then((response) =>
+    ctx.set("lastResponse", response),
+  );
+
+When("(que )eu alugo {int} livro(s) da lista", (quantity) => {
+  const chosenBooks = pickBooks(quantity);
   ctx.set("chosenBooks", chosenBooks);
   cy.log(`Livros escolhidos: ${chosenBooks.map((book) => book.title).join(" | ")}`);
-
-  BookStoreService.addBooksToUser({
-    userId: ctx.get("userId"),
-    isbns: chosenBooks.map((book) => book.isbn),
-    token: ctx.get("token"),
-  }).then((response) => ctx.set("lastResponse", response));
+  rentBooks(
+    chosenBooks.map((book) => book.isbn),
+    ctx.get("token"),
+  );
 });
 
 When("eu tento alugar {int} livro(s) sem token de acesso", (quantity) => {
-  const chosenBooks = faker.helpers.arrayElements(ctx.get("availableBooks"), quantity);
+  rentBooks(pickBooks(quantity).map((book) => book.isbn));
+});
 
-  BookStoreService.addBooksToUser({
-    userId: ctx.get("userId"),
-    isbns: chosenBooks.map((book) => book.isbn),
-  }).then((response) => ctx.set("lastResponse", response));
+When("eu tento alugar {int} livro(s) com um token inválido", (quantity) => {
+  rentBooks(
+    pickBooks(quantity).map((book) => book.isbn),
+    INVALID_TOKEN,
+  );
+});
+
+When("eu tento alugar um livro com ISBN inexistente", () => {
+  rentBooks([NONEXISTENT_ISBN], ctx.get("token"));
+});
+
+When("eu tento alugar o mesmo livro novamente", () => {
+  rentBooks(
+    ctx.get("chosenBooks").map((book) => book.isbn),
+    ctx.get("token"),
+  );
 });
 
 Then("os livros devem ser adicionados à coleção do usuário", () => {
@@ -109,6 +144,12 @@ Then("os livros devem ser adicionados à coleção do usuário", () => {
 // Detalhes do usuário
 When("eu consulto os detalhes do usuário", () => {
   AccountService.getUser(ctx.get("userId"), ctx.get("token")).then((response) => {
+    ctx.set("lastResponse", response);
+  });
+});
+
+When("eu consulto os detalhes do usuário com um token inválido", () => {
+  AccountService.getUser(ctx.get("userId"), INVALID_TOKEN).then((response) => {
     ctx.set("lastResponse", response);
   });
 });

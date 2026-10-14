@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "POST /Account/v1/GenerateToken - 200 (senha incorreta)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["token", "expires", "status", "result"],
+  "properties": {
+    "token": { "type": "null" },
+    "expires": { "type": "null" },
+    "status": { "const": "Failed" },
+    "result": { "const": "User authorization failed." }
+  }
+}
