@@ -12,8 +12,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -30,21 +30,21 @@ jobs:
       matrix:
         suite: [api, front]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
       - name: Executar suíte ${{ matrix.suite }}
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           # usa os scripts do package.json: a action repassa as aspas do --expose literalmente
           command: npm run test:${{ matrix.suite }} -- --browser chrome
 
       - name: Publicar relatório Cucumber
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: relatorio-${{ matrix.suite }}
           path: reports/
@@ -52,7 +52,7 @@ jobs:
 
       - name: Publicar screenshots de falhas
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots-${{ matrix.suite }}
           path: cypress/screenshots/
