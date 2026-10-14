@@ -12,12 +12,14 @@ class ProgressBarPage extends BasePage {
 
   progressValue() {
     return cy
-      .get(this.selectors.progressBar)
-      .invoke("attr", "aria-valuenow")
+      .get(this.selectors.progressBar, { log: false })
+      .invoke({ log: false }, "attr", "aria-valuenow")
       .then(Number);
   }
 
+  // cy.spy no clearInterval, registrado no Before da feature
   start() {
+    cy.get("@clearInterval").invoke("resetHistory");
     cy.get(this.selectors.startStopButton).should("have.text", "Start").click();
     return this;
   }
@@ -41,6 +43,8 @@ class ProgressBarPage extends BasePage {
 
   waitUntilComplete() {
     cy.get(this.selectors.progressBar, { timeout: 30000 }).should("have.attr", "aria-valuenow", "100");
+    // o timer só para uns ms depois de chegar em 100; resetar antes disso era sobrescrito (falhava no CI)
+    cy.get("@clearInterval").should("have.been.called");
     return this;
   }
 

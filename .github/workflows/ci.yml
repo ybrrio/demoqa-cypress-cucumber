@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [api, frontend]
+        suite: [api, front]
     steps:
       - uses: actions/checkout@v4
 
@@ -39,8 +39,8 @@ jobs:
       - name: Executar suíte ${{ matrix.suite }}
         uses: cypress-io/github-action@v6
         with:
-          # tags do cucumber vão via --expose (Cypress 15.17+)
-          command: npx cypress run --browser chrome --expose "tags=@${{ matrix.suite }} and not @known-bug"
+          # usa os scripts do package.json: a action repassa as aspas do --expose literalmente
+          command: npm run test:${{ matrix.suite }} -- --browser chrome
 
       - name: Publicar relatório Cucumber
         if: always()

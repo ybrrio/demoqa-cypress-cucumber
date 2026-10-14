@@ -1,5 +1,12 @@
-import { When, Then } from "@badeball/cypress-cucumber-preprocessor";
+import { Before, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 import ProgressBarPage from "../../pages/ProgressBarPage";
+
+// a barra usa setInterval; o spy mostra quando ela parou de verdade
+Before({ tags: "@widgets" }, () => {
+  cy.on("window:before:load", (win) => {
+    cy.spy(win, "clearInterval").as("clearInterval");
+  });
+});
 
 When("eu inicio a barra de progresso", () => {
   ProgressBarPage.start();
