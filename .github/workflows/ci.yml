@@ -1,0 +1,59 @@
+name: CI - Testes automatizados
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1-5" # execução diária (dias úteis) para detectar regressões no ambiente
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+      - run: npm run lint
+
+  tests:
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [api, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Executar suíte ${{ matrix.suite }}
+        uses: cypress-io/github-action@v6
+        with:
+          # tags do cucumber vão via --expose (Cypress 15.17+)
+          command: npx cypress run --browser chrome --expose "tags=@${{ matrix.suite }} and not @known-bug"
+
+      - name: Publicar relatório Cucumber
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-${{ matrix.suite }}
+          path: reports/
+          if-no-files-found: ignore
+
+      - name: Publicar screenshots de falhas
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.suite }}
+          path: cypress/screenshots/
+          if-no-files-found: ignore

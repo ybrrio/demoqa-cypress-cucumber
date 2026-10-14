@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GET /BookStore/v1/Books - 200",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["books"],
+  "properties": {
+    "books": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "book.json" }
+    }
+  }
+}

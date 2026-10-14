@@ -1,0 +1,15 @@
+{
+  "stepDefinitions": ["cypress/support/step_definitions/**/*.js"],
+  "filterSpecs": true,
+  "omitFiltered": true,
+  "pretty": {
+    "enabled": true
+  },
+  "html": {
+    "enabled": true,
+    "output": "reports/cucumber-report.html"
+  },
+  "attachments": {
+    "addScreenshots": true
+  }
+}

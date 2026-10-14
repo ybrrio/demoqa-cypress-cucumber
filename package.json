@@ -1,0 +1,36 @@
+{
+  "name": "desafio-qa-automation-cypress",
+  "version": "1.0.0",
+  "description": "Desafio QA Automation (DemoQA) - API e Frontend com Cypress + Cucumber (BDD) + Page Objects",
+  "scripts": {
+    "cy:open": "cypress open",
+    "test": "cypress run",
+    "test:api": "cypress run --expose tags=\"@api and not @known-bug\"",
+    "test:front": "cypress run --expose tags=\"@frontend and not @known-bug\"",
+    "test:smoke": "cypress run --expose tags=\"@smoke and not @known-bug\"",
+    "test:bonus": "cypress run --expose tags=@bonus",
+    "test:known-bugs": "cypress run --expose tags=@known-bug",
+    "test:chrome": "cypress run --browser chrome",
+    "test:dry-run": "cypress run --expose dryRun=true",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "28.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "2.2.8",
+    "@eslint/js": "9.39.5",
+    "@faker-js/faker": "10.6.0",
+    "ajv": "8.20.0",
+    "cypress": "15.21.1",
+    "esbuild": "0.27.7",
+    "eslint": "9.39.5",
+    "eslint-plugin-cypress": "5.3.0",
+    "globals": "16.5.0"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
